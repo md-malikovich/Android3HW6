@@ -1,8 +1,12 @@
 package com.e.android3hw6;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.e.android3hw6.base.BaseActivity;
@@ -18,6 +22,8 @@ import static com.e.android3hw6.BuildConfig.ACCESS_KEY;
 public class MainActivity extends BaseActivity {
 
     Spinner spinnerOne, spinnerTwo;
+    EditText etInput;
+    TextView tvShow;
     private ArrayList<String> ratesValues;
 
     @Override
@@ -28,11 +34,37 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
         fetchCurrencies();
+        addTextChangedListener();
+    }
 
+    private void initViews() {
         spinnerOne = findViewById(R.id.spinnerOne);
-        //spinnerTwo = findViewById(R.id.spinnerTwo);
-        ratesValues = new ArrayList<>();
+        spinnerTwo = findViewById(R.id.spinnerTwo);
+        etInput = findViewById(R.id.etInput);
+        tvShow = findViewById(R.id.tvShow);
+    }
+
+    private void addTextChangedListener() {
+        etInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String s = editable.toString();
+                tvShow.setText(s);
+                math(editable);
+            }
+        });
     }
 
     private void fetchCurrencies() {
@@ -44,15 +76,16 @@ public class MainActivity extends BaseActivity {
 
                             JsonObject rates = response.body().getAsJsonObject("rates");
                             Object[] ratesTitles = rates.keySet().toArray();
+                            ratesValues = new ArrayList<>();
 
                             for (Object ratesTitle : ratesTitles) {
                                 ratesValues.add(String.valueOf(rates.getAsJsonPrimitive(ratesTitle.toString())));
                             }
-                            Log.d("ololo", "response");
 
                             ArrayAdapter adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, ratesTitles);
                             spinnerOne.setAdapter(adapter);
-                            //spinnerTwo.setAdapter(adapter);
+                            spinnerTwo.setAdapter(adapter);
+                            //tvShow.setText(rates.getAsJsonPrimitive("KGS").toString());
                         }
                     }
 
@@ -62,8 +95,22 @@ public class MainActivity extends BaseActivity {
                     }
                 });
     }
+
+    private void math(Editable editable) {
+        spinnerOne.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tvShow.setText(ratesValues.get(position).toString().trim());
+                //parse to Double
+                //etInput.getText().toString();
+                //String result = etInput * 2;
+                //etInput.setText(tvShow);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //
+            }
+        });
+    }
 }
-//1. все что мы делали на уроке это был запрос без использования ретрофит,
-// Вам нужно выпилить с проекта asynctask и с помощью ретрофита получить JsomObject.
-//2. В самом приложении по дизайну создать 1 еdittext 2 spinner и поле текстовое для вывода результата.
-//3. Когда мы вводим сумму в поле результата выводим сумму по курсу валют.
