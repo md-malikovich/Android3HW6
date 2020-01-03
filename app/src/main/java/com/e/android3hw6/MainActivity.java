@@ -62,7 +62,7 @@ public class MainActivity extends BaseActivity {
             public void afterTextChanged(Editable editable) {
                 String s = editable.toString();
                 tvShow.setText(s);
-                math(editable);
+                math(editable); //TODO: значение (в будущем - результат) появляется после ввода текста
             }
         });
     }
@@ -101,10 +101,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 tvShow.setText(ratesValues.get(position).toString().trim());
-                //parse to Double
-                //etInput.getText().toString();
-                //String result = etInput * 2;
-                //etInput.setText(tvShow);
+
             }
 
             @Override
